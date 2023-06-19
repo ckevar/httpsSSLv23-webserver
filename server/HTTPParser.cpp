@@ -72,16 +72,14 @@ void HTTPParser::premap_headers() {
 		if ((*http_it == ':') && (*(http_it + 1) == ' ')) {
 			m_header.key[m_header.length].str = tmp_ptr;
 			m_header.key[m_header.length].length = http_it - tmp_ptr;
-			// *http_it = 0;
 			*http_it++; // skips space ": "
-			// std::cout << tmp_ptr + m_header.key[m_header.length].length + 2 << std::endl;
 
 		} else if (*http_it == '\n') {
-			// *http_it = 0; 		// \n
-			// *(http_it - 1) = 0;	// \r
 			tmp_ptr = http_it + 1; // the next pointer is the next line.
 			m_header.length++;
 			m_header.key[m_header.length].str = nullptr;
+
+			// End of headers
 			if (memcmp(http_it - 1, "\r\n\r\n", 4) == 0) {
 				http_it += 2;
 				return;

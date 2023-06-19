@@ -11,6 +11,9 @@
 
 #include "WebServer.h"
 
+// You need to create this file with your own credentials
+#include "Apikeys.h"
+
 // Handler for when a message is received from the client
 void WebServer::onMessageReceived(SSL *clientSocket, const char *msg, int length) {
 	// Parse out the client's request string e.g. GET /index.html HTTP/1.1
@@ -42,15 +45,18 @@ void WebServer::onMessageReceived(SSL *clientSocket, const char *msg, int length
 			// Client is asking for root resource: "/"
 			requestedFile = "/index.html";
 
+			
+			MIMEType(&requestedFile);
+		}  else if (memcmp(http.resource.resource, "/api", 3) == 0) {
+			std::cout << "API REQUESTED" << std::endl;
 			// get "Host"
 			char *Host;
 			if (http.get_header(HTTP_HOST_STR, HTTP_HOST_LEN, &Host) == 0)
 				std::cout << "get_header(\"Host\") " <<  " " << Host << std::endl;
 			else 
 				std::cerr << "[ERROR] no Host field found" << std::endl;
-			
-			MIMEType(&requestedFile);
-		} 
+
+		}
 		// TODO: check other resources
 		
 	} 

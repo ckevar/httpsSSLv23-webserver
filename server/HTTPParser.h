@@ -30,6 +30,9 @@
 #define HTTP_HOST_STR  			"Host"
 #define HTTP_HOST_LEN  			4
 
+#define HTTP_AUTHORIZATION_STR  "Authorization"
+#define HTTP_AUTHORIZATION_LEN  13
+
 #define HTTP_CONTENT_LENGTH_STR "Content-Length"
 #define HTTP_CONTENT_LENGTH_LEN	14
 
