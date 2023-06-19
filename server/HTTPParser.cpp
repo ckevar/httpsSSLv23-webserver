@@ -94,7 +94,7 @@ char HTTPParser::get_header(const char *headerfield, int length, char **arg) {
 	// from experiments, it shows that the first letter and the last two letters 
 	// are enough to identify the header
 	char *aux;
-	std::cout << "->1 arg ptr " << (void *) &arg << std::endl;
+	
 	for (unsigned short i = 0; i < m_header.length; ++i) {
 		// First we check the string length
 		if (m_header.key[i].length == length) {
@@ -106,8 +106,6 @@ char HTTPParser::get_header(const char *headerfield, int length, char **arg) {
 					*(aux - 2) == *(headerfield + length - 2)) {
 					// the value of the header fields starts after the ": ", two characters
 					*arg = aux + 2;
-					std::cout << "->2 arg ptr " << (void *) &arg << std::endl;
-					std::cout << headerfield << "->reponse->" << *arg << std::endl;
 					return 0; 	// found it 
 				}
 			}
