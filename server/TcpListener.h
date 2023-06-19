@@ -33,7 +33,6 @@ protected:
 	virtual void onClientDisconnected(int clientSocket);
 
 	// Handler for when a message is received from the client
-	//virtual void onMessageReceived(int clientSocket, const char* msg, int length);
 	virtual void onMessageReceived(SSL *clientSocket, const char *msg, int length);
 
 	// Send a message to a client

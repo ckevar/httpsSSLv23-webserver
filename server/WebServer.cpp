@@ -16,31 +16,49 @@ void WebServer::onMessageReceived(SSL *clientSocket, const char *msg, int length
 	// Parse out the client's request string e.g. GET /index.html HTTP/1.1
 	http.load((char *)msg);
 	http.parse();
-	/*
+
+	#ifdef DEBUG
+	std::cout << std::endl << std::endl << std::endl;
 	std::cout << "->Method " << http.RESTMethod << std::endl;
-	std::cout << "->Resource Length " << http.resource.size << std::endl;
+	std::cout << "->Resource Length " << http.resource.length << std::endl;
 	std::cout << "->Resource " << http.resource.resource << std::endl;
 	std::cout << "->Content-Length " << http.ContentLength << std::endl;
-	std::cout << "->Content " << http.Content << std::endl;
-	*/
-
+	#endif
 
 	// Some defaults for output to the client (404 file not found 'page')
 	std::string content = "<h1>404 Not Found</h1>";
 	std::string requestedFile = "/notfound.html";
 	contentType = "text/html";
 	int errorCode = 404;
-	// If the GET request is valid, try and get the name
-	// std::cout << msg << std::endl;
+
+	// TODO: validate header
+	// 		Use HOST, or CORS
+
+	// This is checking headers
+	// GET Method
 	if (http.RESTMethod == HTTP_METHOD_GET) {
 
-		if (memcmp(http.resource.resource, "/ ", 2) == 0)
+		if (http.resource.length == 1) {
+			// Client is asking for root resource: "/"
 			requestedFile = "/index.html";
-		MIMEType(&requestedFile);
 
-	} else if (http.RESTMethod == HTTP_METHOD_POST){
-		if (memcmp(http.resource.resource, "/ ", 2) == 0)
+			// get "Host"
+			char *Host;
+			if (http.get_header(HTTP_HOST_STR, HTTP_HOST_LEN, &Host) == 0)
+				std::cout << "get_header(\"Host\") " <<  " " << Host << std::endl;
+			else 
+				std::cerr << "[ERROR] no Host field found" << std::endl;
+			
+			MIMEType(&requestedFile);
+		} 
+		// TODO: check other resources
+		
+	} 
+	// POST Method
+	else if (http.RESTMethod == HTTP_METHOD_POST){
+		if (http.resource.length == 1) {
 			std::cout << "content " << http.Content << std::endl;
+		}
 	}
 
 	std::ostringstream oss;
