@@ -61,7 +61,7 @@ void HTTPParser::get_resource() {
 	http_it++; 
 }
 
-void HTTPParser::premap_headers() {
+void HTTPParser::map_headers() {
 	char *tmp_ptr;
 
 	m_header.length = 0;
@@ -72,16 +72,20 @@ void HTTPParser::premap_headers() {
 		if ((*http_it == ':') && (*(http_it + 1) == ' ')) {
 			m_header.key[m_header.length].str = tmp_ptr;
 			m_header.key[m_header.length].length = http_it - tmp_ptr;
+			m_header.length++;
+			m_header.key[m_header.length].str = nullptr;
 			*http_it++; // skips space ": "
 
 		} else if (*http_it == '\n') {
-			tmp_ptr = http_it + 1; // the next pointer is the next line.
-			m_header.length++;
-			m_header.key[m_header.length].str = nullptr;
+
+			/* Next header field shall start at the beginning
+            of the next line */
+			tmp_ptr = http_it + 1;
 
 			// End of headers
 			if (memcmp(http_it - 1, "\r\n\r\n", 4) == 0) {
 				http_it += 2;
+				Content = http_it; /* locate Content Address */
 				return;
 			}
 		} 
@@ -94,7 +98,7 @@ char HTTPParser::get_header(const char *headerfield, int length, char **arg) {
 	// from experiments, it shows that the first letter and the last two letters 
 	// are enough to identify the header
 	char *aux;
-	
+
 	for (unsigned short i = 0; i < m_header.length; ++i) {
 		// First we check the string length
 		if (m_header.key[i].length == length) {
@@ -114,34 +118,6 @@ char HTTPParser::get_header(const char *headerfield, int length, char **arg) {
 	return 1; // not found 
 }
 
-void HTTPParser::lookup_HeaderFields(){
-	ContentLength = 0;
-	while(*http_it) {
-		// Extract Content Length
-		if(memcmp(http_it, HTTP_CONTENT_LENGTH_STR, HTTP_CONTENT_LENGTH_LEN) == 0) {
-			http_it += HTTP_CONTENT_LENGTH_LEN;
-			while(*http_it != '\r') {
-				ContentLength = ContentLength * 10 + *http_it - 48;
-				http_it++;
-			}
-			return;
-		}
-
-		// TODO: Extract other header fields
-		http_it++;
-	}
-}
-
-void HTTPParser::locate_Content(){
-	while(*http_it){
-		if(memcmp(http_it, "\r\n\r\n", 4) == 0){
-			http_it += 4;
-			Content = http_it;
-		}
-		http_it++;
-	}
-}
-
 char HTTPParser::parse(){
 
 	// Get REST Method
@@ -151,12 +127,8 @@ char HTTPParser::parse(){
 	// Locate Resource
 	get_resource();
 
-	// Lookup and Locate Header Fields
-	premap_headers();
-	// lookup_HeaderFields();
-
-	// Locate Content
-	locate_Content();
+	// Map header fields pointers
+	map_headers();
 
 	// Reset http iterator
 	http_it = http;

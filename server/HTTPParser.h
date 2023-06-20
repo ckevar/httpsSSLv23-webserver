@@ -83,9 +83,7 @@ private:
 	// Methods
 	void lookup_method();
 	void get_resource();
-	void lookup_HeaderFields();
-	void premap_headers();
-	void locate_Content();
+	void map_headers();
 };
 
 #endif
